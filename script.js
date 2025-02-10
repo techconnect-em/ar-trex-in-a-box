@@ -11,6 +11,41 @@ AFRAME.registerComponent('ar-controller', {
         this.setupButtons();
     },
 
+    setupModelHandlers: function() {
+        // モデルのロード完了時の処理
+        this.model.addEventListener('model-loaded', () => {
+            this.updateDebug('モデルが読み込まれました');
+            const mesh = this.model.getObject3D('mesh');
+            if (mesh) {
+                // アニメーションの確認
+                if (mesh.animations && mesh.animations.length > 0) {
+                    this.updateDebug(`利用可能なアニメーション: ${mesh.animations.length}個`);
+                    mesh.animations.forEach(anim => {
+                        this.updateDebug(`- ${anim.name}`);
+                    });
+                }
+                this.model.setAttribute('visible', true);
+            }
+        });
+
+        // モデルのロードエラー時の処理
+        this.model.addEventListener('model-error', (error) => {
+            this.updateDebug(`モデルエラー: ${error.detail.src}`);
+            console.error('モデルエラー:', error);
+        });
+    },
+
+    setupEventListeners: function() {
+        this.el.addEventListener('targetFound', () => {
+            this.updateDebug('マーカーを認識しました');
+            this.model.setAttribute('visible', true);
+        });
+
+        this.el.addEventListener('targetLost', () => {
+            this.updateDebug('マーカーをロストしました');
+        });
+    },
+
     setupButtons: function() {
         // 箱から出すボタンの処理
         if (this.releaseButton) {
@@ -52,35 +87,6 @@ AFRAME.registerComponent('ar-controller', {
                 link.click();
             });
         }
-    },
-
-    setupModelHandlers: function() {
-        this.model.addEventListener('model-loaded', () => {
-            this.updateDebug('モデルが読み込まれました');
-            const mesh = this.model.getObject3D('mesh');
-            if (mesh) {
-                if (mesh.animations && mesh.animations.length > 0) {
-                    this.updateDebug(`アニメーション数: ${mesh.animations.length}`);
-                }
-                this.model.setAttribute('visible', true);
-            }
-        });
-
-        this.model.addEventListener('model-error', (error) => {
-            this.updateDebug(`モデルエラー: ${error.detail.src}`);
-            console.error('モデルエラー:', error);
-        });
-    },
-
-    setupEventListeners: function() {
-        this.el.addEventListener('targetFound', () => {
-            this.updateDebug('マーカーを認識しました');
-            this.model.setAttribute('visible', true);
-        });
-
-        this.el.addEventListener('targetLost', () => {
-            this.updateDebug('マーカーをロストしました');
-        });
     },
 
     updateDebug: function(message) {

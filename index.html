@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dinosaur AR Experience</title>
 
-    <!-- A-Frame および MindAR の読み込み -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
+    <!-- A-Frame 1.6.0 に更新 -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <!-- アニメーション用のextrasライブラリを追加 -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <!-- MindAR -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- スタイルシートの読み込み -->
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -25,8 +27,12 @@
         device-orientation-permission-ui="enabled: false">
 
         <a-assets>
-            <a-asset-item id="dinosaur-model" src="https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/animated_tyrannosaurus_rex_dinosaur_running_loop.glb?v=1739163999760"></a-asset-item>
+            <a-asset-item id="dinosaur-model" src="https://cdn.glitch.me/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Rampaging%20T-Rex.glb?v=1739155222514"></a-asset-item>
         </a-assets>
+
+        <!-- ライティングの設定 -->
+        <a-light type="ambient" intensity="1"></a-light>
+        <a-light type="directional" intensity="0.8" position="1 1 1"></a-light>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
@@ -34,11 +40,10 @@
             <a-entity
                 id="dinosaur"
                 gltf-model="#dinosaur-model"
+                animation-mixer=""
                 position="0 -0.2 0"
                 scale="0.05 0.05 0.05"
-                rotation="0 90 0"
-                animation-mixer="clip: Take 001; loop: repeat; timeScale: 1"
-                shadow="cast: true; receive: true">
+                rotation="0 90 0">
             </a-entity>
         </a-entity>
     </a-scene>
