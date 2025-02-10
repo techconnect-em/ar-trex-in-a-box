@@ -16,7 +16,7 @@
 
 <body>
     <a-scene
-        mindar-image="imageTargetSrc: [マーカー画像のURL];"
+        mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
         color-space="sRGB"
         renderer="colorManagement: true, physicallyCorrectLights: true"
         vr-mode-ui="enabled: false"
@@ -30,14 +30,14 @@
 
         <a-entity mindar-image-target="targetIndex: 0" ar-controller>
             <a-entity
-                id="dinosaur"
-                gltf-model="#dinosaur-model"
-                position="0 0 0.1"
-                scale="0.1 0.1 0.1"
-                rotation="0 0 0"
-                animation-mixer="clip: *; loop: repeat"
-                visible="false">
-            </a-entity>
+    id="dinosaur"
+    gltf-model="#dinosaur-model"
+    position="0 0 0.1"
+    scale="0.1 0.1 0.1"
+    rotation="0 0 0"
+    animation-mixer="clip: Take 001; loop: repeat; timeScale: 1;"
+    visible="false">
+</a-entity>
         </a-entity>
     </a-scene>
 
