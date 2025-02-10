@@ -1,35 +1,77 @@
-setupModelHandlers: function() {
-    // モデルのロード完了時の処理
-    this.model.addEventListener('model-loaded', () => {
-        console.log('モデルが読み込まれました');
-        
-        // アニメーションミキサーの設定
-        const mesh = this.model.getObject3D('mesh');
-        if (mesh) {
-            // モデルに含まれるアニメーションを確認
-            const animations = mesh.animations;
-            if (animations && animations.length > 0) {
-                console.log('利用可能なアニメーション:', animations.map(a => a.name));
-                
-                // アニメーションミキサーの再設定
-                this.model.removeAttribute('animation-mixer');
-                this.model.setAttribute('animation-mixer', {
-                    clip: 'Take 001',  // アニメーションクリップ名
-                    loop: 'repeat',
-                    timeScale: 1,
-                    crossFadeDuration: 0.3
-                });
-            }
+AFRAME.registerComponent('ar-controller', {
+    init: function() {
+        this.model = this.el.querySelector('#dinosaur');
+        this.debugEl = document.getElementById('debug');
+        this.setupModelHandlers();
+        this.setupEventListeners();
+    },
 
-            // マテリアルの設定を確認
-            if (mesh.material) {
-                console.log('マテリアル設定:', mesh.material);
+    setupModelHandlers: function() {
+        // モデルのロード完了時の処理
+        this.model.addEventListener('model-loaded', () => {
+            this.updateDebug('メッシュが存在します');
+            const mesh = this.model.getObject3D('mesh');
+            if (mesh) {
+                if (mesh.animations && mesh.animations.length > 0) {
+                    this.updateDebug(`アニメーション数: ${mesh.animations.length}`);
+                }
+                // モデルが読み込まれたら表示を確実に有効化
+                this.model.setAttribute('visible', true);
+            } else {
+                this.updateDebug('メッシュが存在しません');
             }
+        });
+
+        // モデルのロードエラー時の処理
+        this.model.addEventListener('model-error', (error) => {
+            this.updateDebug(`モデルエラー: ${error.detail.src}`);
+            console.error('モデルエラー:', error);
+        });
+    },
+
+    updateDebug: function(message) {
+        if (this.debugEl) {
+            this.debugEl.innerHTML += `<div>${message}</div>`;
+            console.log(message);
         }
-    });
+    },
 
-    // モデルのロードエラー時の処理
-    this.model.addEventListener('model-error', (error) => {
-        console.error('モデルの読み込みエラー:', error);
-    });
-},
+    setupEventListeners: function() {
+        this.el.addEventListener('targetFound', () => {
+            this.updateDebug('マーカーを認識しました');
+            // マーカー認識時にモデルを確実に表示
+            this.model.setAttribute('visible', true);
+            document.querySelectorAll('.ar-only').forEach(el => {
+                el.style.display = 'block';
+            });
+        });
+
+        this.el.addEventListener('targetLost', () => {
+            this.updateDebug('マーカーをロストしました');
+            document.querySelectorAll('.ar-only').forEach(el => {
+                el.style.display = 'none';
+            });
+        });
+
+        // 「箱から出す」ボタンの処理
+        const releaseButton = document.getElementById('release-button');
+        if (releaseButton) {
+            releaseButton.addEventListener('click', () => {
+                this.updateDebug('モデルを拡大します');
+                this.model.setAttribute('animation__scale', {
+                    property: 'scale',
+                    to: '1 1 1',
+                    dur: 1000,
+                    easing: 'easeOutElastic'
+                });
+                
+                this.model.setAttribute('animation__position', {
+                    property: 'position',
+                    to: '0 0.5 0',
+                    dur: 1000,
+                    easing: 'easeOutQuad'
+                });
+            });
+        }
+    }
+});
