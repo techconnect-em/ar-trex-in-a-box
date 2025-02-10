@@ -17,13 +17,38 @@ AFRAME.registerComponent('ar-controller', {
             this.updateDebug('モデルが読み込まれました');
             const mesh = this.model.getObject3D('mesh');
             if (mesh) {
-                // アニメーションの確認
+                // テクスチャとマテリアルの設定
+                mesh.traverse((node) => {
+                    if (node.isMesh) {
+                        // マテリアルの設定を最適化
+                        node.material.needsUpdate = true;
+                        node.material.side = THREE.DoubleSide;
+                        node.material.transparent = true;
+                        node.material.alphaTest = 0.5;
+                        
+                        // テクスチャのアップデートを強制
+                        if (node.material.map) {
+                            node.material.map.needsUpdate = true;
+                        }
+                        
+                        this.updateDebug('マテリアルを更新しました');
+                    }
+                });
+
+                // アニメーションの確認と設定
                 if (mesh.animations && mesh.animations.length > 0) {
-                    this.updateDebug(`利用可能なアニメーション: ${mesh.animations.length}個`);
+                    this.updateDebug(`アニメーション数: ${mesh.animations.length}`);
                     mesh.animations.forEach(anim => {
-                        this.updateDebug(`- ${anim.name}`);
+                        this.updateDebug(`アニメーション名: ${anim.name}`);
+                    });
+                    
+                    // アニメーションミキサーの設定を更新
+                    this.model.setAttribute('animation-mixer', {
+                        timeScale: 1.5,
+                        loop: 'repeat'
                     });
                 }
+                
                 this.model.setAttribute('visible', true);
             }
         });
@@ -39,6 +64,9 @@ AFRAME.registerComponent('ar-controller', {
         this.el.addEventListener('targetFound', () => {
             this.updateDebug('マーカーを認識しました');
             this.model.setAttribute('visible', true);
+            
+            // アニメーションを再開
+            this.model.components['animation-mixer'].play();
         });
 
         this.el.addEventListener('targetLost', () => {
@@ -52,18 +80,27 @@ AFRAME.registerComponent('ar-controller', {
             this.releaseButton.addEventListener('click', () => {
                 if (!this.isLargeSize) {
                     this.updateDebug('モデルを拡大します');
+                    
+                    // スケールアニメーション
                     this.model.setAttribute('animation__scale', {
                         property: 'scale',
                         to: '0.5 0.5 0.5',
-                        dur: 1000,
+                        dur: 1500,
                         easing: 'easeOutElastic'
                     });
                     
+                    // 位置アニメーション
                     this.model.setAttribute('animation__position', {
                         property: 'position',
                         to: '0 0 1',
-                        dur: 1000,
+                        dur: 1500,
                         easing: 'easeOutQuad'
+                    });
+
+                    // アニメーション速度を上げる
+                    this.model.setAttribute('animation-mixer', {
+                        timeScale: 2.0,
+                        loop: 'repeat'
                     });
 
                     this.releaseButton.textContent = '放出済み';

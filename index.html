@@ -22,17 +22,18 @@
     <a-scene
         mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
         color-space="sRGB"
-        renderer="colorManagement: true; physicallyCorrectLights: true"
+        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false">
 
         <a-assets>
-            <a-asset-item id="dinosaur-model" src="https://cdn.glitch.me/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Rampaging%20T-Rex.glb?v=1739155222514"></a-asset-item>
+            <a-asset-item id="dinosaur-model" src="https://cdn.glitch.me/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Rampaging%20T-Rex.glb?v=1739155222514" response-type="arraybuffer"></a-asset-item>
         </a-assets>
 
         <!-- ライティングの設定 -->
-        <a-light type="ambient" intensity="1"></a-light>
-        <a-light type="directional" intensity="0.8" position="1 1 1"></a-light>
+        <a-light type="ambient" intensity="1" color="#ffffff"></a-light>
+        <a-light type="directional" intensity="1" color="#ffffff" position="1 1 1"></a-light>
+        <a-light type="hemisphere" intensity="0.5" color="#ffffff" groundColor="#ffffff"></a-light>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
@@ -40,10 +41,12 @@
             <a-entity
                 id="dinosaur"
                 gltf-model="#dinosaur-model"
-                animation-mixer=""
+                animation-mixer="timeScale: 1.5; loop: repeat"
                 position="0 -0.2 0"
                 scale="0.05 0.05 0.05"
-                rotation="0 90 0">
+                rotation="0 90 0"
+                material="shader: standard; roughness: 1; metalness: 0;"
+                shadow="cast: true; receive: true">
             </a-entity>
         </a-entity>
     </a-scene>
