@@ -1,34 +1,82 @@
-/*
-  This is your site JavaScript code - you can add interactivity!
-*/
+// ARコントローラーコンポーネントの定義
+AFRAME.registerComponent('ar-controller', {
+    init: function() {
+        this.model = this.el.querySelector('#dinosaur');
+        this.releaseButton = document.getElementById('release-button');
+        this.isLargeSize = false;
+        this.setupEventListeners();
+    },
 
-// Print a message in the browser's dev tools console each time the page loads
-// Use your menus or right-click / control-click and choose "Inspect" > "Console"
-console.log("Hello 🌎");
+    setupEventListeners: function() {
+        // マーカー認識時の処理
+        this.el.addEventListener('targetFound', () => {
+            console.log('マーカーを認識しました');
+            this.model.setAttribute('visible', true);
+            this.showARElements();
+        });
 
-/* 
-Make the "Click me!" button move when the visitor clicks it:
-- First add the button to the page by following the steps in the TODO 🚧
-*/
-const btn = document.querySelector("button"); // Get the button from the page
-if (btn) { // Detect clicks on the button
-  btn.onclick = function () {
-    // The 'dipped' class in style.css changes the appearance on click
-    btn.classList.toggle("dipped");
-  };
-}
+        // マーカーロスト時の処理
+        this.el.addEventListener('targetLost', () => {
+            console.log('マーカーをロストしました');
+            this.hideARElements();
+        });
 
+        // 箱から出すボタンの処理
+        this.releaseButton.addEventListener('click', () => {
+            if (!this.isLargeSize) {
+                this.releaseDinosaur();
+                this.isLargeSize = true;
+            }
+        });
+    },
 
-// ----- GLITCH STARTER PROJECT HELPER CODE -----
+    showARElements: function() {
+        document.querySelectorAll('.ar-only').forEach(el => {
+            el.style.display = 'block';
+        });
+    },
 
-// Open file when the link in the preview is clicked
-let goto = (file, line) => {
-  window.parent.postMessage(
-    { type: "glitch/go-to-line", payload: { filePath: file, line: line } }, "*"
-  );
-};
-// Get the file opening button from its class name
-const filer = document.querySelectorAll(".fileopener");
-filer.forEach((f) => {
-  f.onclick = () => { goto(f.dataset.file, f.dataset.line); };
+    hideARElements: function() {
+        document.querySelectorAll('.ar-only').forEach(el => {
+            el.style.display = 'none';
+        });
+    },
+
+    releaseDinosaur: function() {
+        // 恐竜モデルを大きくするアニメーション
+        this.model.setAttribute('animation', {
+            property: 'scale',
+            to: '2 2 2',
+            dur: 1000,
+            easing: 'easeOutElastic'
+        });
+        
+        // 位置を調整するアニメーション
+        this.model.setAttribute('animation__position', {
+            property: 'position',
+            to: '0 0 0',
+            dur: 1000,
+            easing: 'easeOutQuad'
+        });
+
+        // ボタンのテキストを変更
+        this.releaseButton.textContent = '放出済み';
+        this.releaseButton.style.backgroundColor = 'rgba(128, 128, 128, 0.8)';
+    }
+});
+
+// 写真撮影機能の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    const captureButton = document.getElementById('capture');
+    
+    captureButton.addEventListener('click', function() {
+        const scene = document.querySelector('a-scene');
+        const img = scene.components.screenshot.getCanvas('perspective');
+        
+        // 画像をダウンロード
+        const link = document.createElement('a');
+        link.setAttribute('download', 'ar-dinosaur.png');
+        link.setAttribute('href', img.toDataURL('image/png'));
+        link.click();
+    });
 });
