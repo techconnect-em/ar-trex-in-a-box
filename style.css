@@ -37,6 +37,4 @@ body {
     background-color: rgba(255, 99, 71, 0.9);
 }
 
-.ar-only {
-    display: none;
-}
+/* .ar-onlyクラスの設定を削除（常に表示） */

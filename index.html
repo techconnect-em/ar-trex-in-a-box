@@ -15,7 +15,6 @@
 </head>
 
 <body>
-    <!-- デバッグ用のステータス表示 -->
     <div id="debug" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; padding: 10px; z-index: 1000;"></div>
 
     <a-scene
@@ -23,8 +22,7 @@
         color-space="sRGB"
         renderer="colorManagement: true; physicallyCorrectLights: true"
         vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-        loading-screen="enabled: false">
+        device-orientation-permission-ui="enabled: false">
 
         <a-assets>
             <a-asset-item id="dinosaur-model" src="https://cdn.glitch.me/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Rampaging%20T-Rex.glb?v=1739155222514"></a-asset-item>
@@ -33,29 +31,23 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- デバッグ用の箱 -->
-            <a-box position="0 0.5 0" scale="0.2 0.2 0.2" color="red"></a-box>
-            
-            <!-- 3Dモデル -->
             <a-entity
                 id="dinosaur"
                 gltf-model="#dinosaur-model"
-                position="0 0 0"
-                scale="0.1 0.1 0.1"
-                rotation="0 0 0"
-                animation-mixer="timeScale: 1"
-                visible="true">
+                position="0 -0.2 0"
+                scale="0.05 0.05 0.05"
+                rotation="0 90 0"
+                animation-mixer="clip: Take 001; loop: repeat; timeScale: 1"
+                shadow="cast: true; receive: true">
             </a-entity>
         </a-entity>
     </a-scene>
 
-    <!-- UI buttons -->
     <div class="buttons">
-        <button class="button ar-only" id="release-button">箱から出す</button>
-        <button class="button ar-only" id="capture">写真を撮る</button>
+        <button class="button" id="release-button">箱から出す</button>
+        <button class="button" id="capture">写真を撮る</button>
     </div>
 
-    <!-- スクリプトの読み込み -->
     <script src="script.js"></script>
 </body>
 </html>
