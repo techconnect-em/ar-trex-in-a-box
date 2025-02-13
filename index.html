@@ -15,18 +15,6 @@
   </head>
 
   <body>
-    <div
-      id="debug"
-      style="
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        background: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 10px;
-        z-index: 1000;
-      "
-    ></div>
 
     <a-scene
       mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
@@ -34,6 +22,7 @@
       renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
+      id="scene"
     >
       <a-assets>
         <a-asset-item
@@ -90,18 +79,16 @@
       </a-entity>
     </a-scene>
 
+    <!-- カメラボタンUI -->
     <div class="ar-ui">
         <div class="buttons">
             <button class="button camera-button" id="capture">
-                <div class="camera-icon"></div>
+                📷 撮影
             </button>
-        </div>
-        <div class="share-options" id="share-options">
-            <button class="button share-button" id="download">保存</button>
-            <button class="button share-button" id="share">シェア</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- スクリプトファイル -->
+    <script src="./script.js"></script>
   </body>
 </html>
