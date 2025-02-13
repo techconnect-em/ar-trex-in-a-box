@@ -23,6 +23,7 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
       id="scene"
+          
     >
       <a-assets>
         <a-asset-item
@@ -81,12 +82,12 @@
 
     <!-- カメラボタンUI -->
     <div class="ar-ui">
-        <div class="buttons">
-            <button class="button camera-button" id="capture">
-                📷 撮影
-            </button>
-        </div>
-    </div>
+  <div class="buttons">
+    <button class="camera-button" id="capture">
+      <div class="camera-icon"></div>
+    </button>
+  </div>
+</div>
 
     <!-- スクリプトファイル -->
     <script src="./script.js"></script>
