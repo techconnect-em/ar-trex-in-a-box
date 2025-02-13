@@ -15,79 +15,79 @@
   </head>
 
   <body>
-
-    <a-scene
-      mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
-      color-space="sRGB"
-      renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-      id="scene"
-          
-    >
-      <a-assets>
-        <a-asset-item
-          id="dinosaur-model"
-          src="https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Running_T-Rex.glb?v=1739189988170"
-        ></a-asset-item>
-      </a-assets>
-
-      <!-- 強化されたライティング設定 -->
-      <!-- 環境光 - 全体的な明るさ -->
-      <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
-
-      <!-- メインの方向光 - 主要な影とハイライト -->
-      <a-light
-        type="directional"
-        color="#ffffff"
-        intensity="1"
-        position="2 4 -3"
-        target="#dinosaur"
+    <div class="example-container">
+      <a-scene
+        mindar-image="imageTargetSrc: ..."
+        embedded
+        color-space="sRGB"
+        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
       >
-      </a-light>
+        <a-assets>
+          <a-asset-item
+            id="dinosaur-model"
+            src="https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/Running_T-Rex.glb?v=1739189988170"
+          ></a-asset-item>
+        </a-assets>
 
-      <!-- 補助光 - 影の部分を明るく -->
-      <a-light type="point" color="#ffffff" intensity="0.5" position="-2 1 1">
-      </a-light>
+        <!-- 強化されたライティング設定 -->
+        <!-- 環境光 - 全体的な明るさ -->
+        <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
 
-      <!-- 環境光2 - 下からの反射光 -->
-      <a-light
-        type="hemisphere"
-        color="#ffffff"
-        groundColor="#b4a87e"
-        intensity="0.5"
-      >
-      </a-light>
+        <!-- メインの方向光 - 主要な影とハイライト -->
+        <a-light
+          type="directional"
+          color="#ffffff"
+          intensity="1"
+          position="2 4 -3"
+          target="#dinosaur"
+        >
+        </a-light>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <!-- 補助光 - 影の部分を明るく -->
+        <a-light type="point" color="#ffffff" intensity="0.5" position="-2 1 1">
+        </a-light>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-entity
-          id="dinosaur"
-          gltf-model="#dinosaur-model"
-          animation-mixer="clip: idle; timeScale: 1.5; loop: repeat"
-          position="-0.2 -0.5 -0.2"
-          scale="0.25 0.25 0.25"
-          rotation="0 45 0"
-          material="shader: standard; 
+        <!-- 環境光2 - 下からの反射光 -->
+        <a-light
+          type="hemisphere"
+          color="#ffffff"
+          groundColor="#b4a87e"
+          intensity="0.5"
+        >
+        </a-light>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-image-target="targetIndex: 0">
+          <a-entity
+            id="dinosaur"
+            gltf-model="#dinosaur-model"
+            animation-mixer="clip: idle; timeScale: 1.5; loop: repeat"
+            position="-0.2 -0.5 -0.2"
+            scale="0.25 0.25 0.25"
+            rotation="0 45 0"
+            material="shader: standard; 
                          roughness: 0.7; 
                          metalness: 0.1;
                          normalScale: 1 1;
                          envMapIntensity: 1;"
-          shadow="cast: true; receive: true"
-        >
+            shadow="cast: true; receive: true"
+          >
+          </a-entity>
         </a-entity>
-      </a-entity>
-    </a-scene>
+      </a-scene>
+    </div>
 
     <!-- カメラボタンUI -->
     <div class="ar-ui">
-  <div class="buttons">
-    <button class="camera-button" id="capture">
-      <div class="camera-icon"></div>
-    </button>
-  </div>
-</div>
+      <div class="buttons">
+        <button class="camera-button" id="capture">
+          <div class="camera-icon"></div>
+        </button>
+      </div>
+    </div>
 
     <!-- スクリプトファイル -->
     <script src="./script.js"></script>
