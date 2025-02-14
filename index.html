@@ -17,13 +17,12 @@
   <body>
     <div class="example-container">
       <a-scene
-        mindar-image="imageTargetSrc: ..."
-        embedded
-        color-space="sRGB"
-        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-      >
+            mindar-image="imageTargetSrc:https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813"
+            embedded
+            color-space="sRGB"
+            renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+            vr-mode-ui="enabled: false"
+            device-orientation-permission-ui="enabled: false">
         <a-assets>
           <a-asset-item
             id="dinosaur-model"
@@ -81,12 +80,10 @@
     </div>
 
     <!-- カメラボタンUI -->
-    <div class="ar-ui">
-      <div class="buttons">
-        <button class="camera-button" id="capture">
-          <div class="camera-icon"></div>
+    <div id="button-container">
+        <button class="button camera-button" id="capture">
+            <div class="camera-icon"></div>
         </button>
-      </div>
     </div>
 
     <!-- スクリプトファイル -->
