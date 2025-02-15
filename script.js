@@ -120,6 +120,50 @@ AFRAME.registerComponent("ar-controller", {
         // 元のgetCanvas関数を復元
         scene.components.screenshot.getCanvas = originalGetCanvas;
       });
+
+      // シェアボタンの処理
+      if (this.shareButton) {
+        this.shareButton.addEventListener("click", async () => {
+          try {
+            // キャプチャした画像をBlobに変換
+            const response = await fetch(this.capturedImage.src);
+            const blob = await response.blob();
+            const file = new File([blob], "ar-capture.png", {
+              type: "image/png",
+            });
+
+            // Web Share APIを使用
+            if (navigator.share) {
+              await navigator.share({
+                files: [file],
+                title: "AR Capture",
+                text: "Check out my AR capture!",
+              });
+            } else {
+              // シェアAPI非対応の場合はダウンロード
+              const link = document.createElement("a");
+              link.href = this.capturedImage.src;
+              link.download = "ar-capture.png";
+              link.click();
+            }
+          } catch (error) {
+            console.error("Failed to share:", error);
+          }
+        });
+      }
+      // 閉じるボタンの処理
+      if (this.closeModal) {
+        this.closeModal.addEventListener("click", () => {
+          this.shareModal.classList.add("hidden");
+        });
+      }
+
+      // モーダル外クリックで閉じる
+      this.shareModal.addEventListener("click", (event) => {
+        if (event.target === this.shareModal) {
+          this.shareModal.classList.add("hidden");
+        }
+      });
     }
 
     // Webサイトボタンの処理
