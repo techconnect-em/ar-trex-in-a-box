@@ -98,15 +98,20 @@ a-scene {
 
 .share-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    top: 50%; /* 画面中央 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 中央揃え */
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    background: rgba(255, 255, 255, 1);
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    border-radius: 20px;
     z-index: 2000;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content {

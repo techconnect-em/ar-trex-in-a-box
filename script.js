@@ -44,26 +44,30 @@ AFRAME.registerComponent('ar-controller', {
     },
 
     setupButtons: function() {
-        // 撮影ボタンの処理
-        if (this.captureButton) {
-            this.captureButton.addEventListener('click', async () => {
-                const scene = document.querySelector('a-scene');
-                const canvas = scene.components.screenshot.getCanvas('perspective');
-                const aspectRatio = window.innerHeight / window.innerWidth;
-                const finalCanvas = document.createElement('canvas');
-                const ctx = finalCanvas.getContext('2d');
-                
-                finalCanvas.width = window.innerWidth;
-                finalCanvas.height = window.innerHeight;
-                
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                ctx.drawImage(canvas, 0, 0, finalCanvas.width, finalCanvas.height);
-                
-                this.capturedImage.src = finalCanvas.toDataURL('image/png');
-                this.shareModal.classList.remove('hidden');
-            });
-        }
+    if (this.captureButton) {
+        this.captureButton.addEventListener('click', async () => {
+            const scene = document.querySelector('.example-container'); // AR全体コンテナ
+            const video = document.querySelector('video'); // MindARカメラ映像
+
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
+
+            finalCanvas.width = window.innerWidth;
+            finalCanvas.height = window.innerHeight;
+
+            // 背景（カメラ映像）を描画
+            ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
+
+            // A-Frameシーンをキャプチャ
+            const sceneCanvas = scene.querySelector('canvas');
+            ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+
+            // キャプチャした画像データをモーダルに表示
+            this.capturedImage.src = finalCanvas.toDataURL('image/png');
+            this.shareModal.classList.remove('hidden');
+        });
+    }
+}
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
