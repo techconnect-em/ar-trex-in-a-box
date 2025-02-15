@@ -5,6 +5,21 @@ AFRAME.registerComponent('ar-controller', {
         this.websiteButton = document.getElementById('website-button');
         this.releaseButton = document.getElementById('release-button');
         this.dinosaurModel = this.el.querySelector('#dinosaur');
+       if (this.dinosaurModel) {
+            // 初期アニメーションを設定
+            this.currentAnimation = 'idle';
+            
+            // 3秒ごとにアニメーションを切り替え
+            setInterval(() => {
+                this.currentAnimation = this.currentAnimation === 'idle' ? 'attack_tail' : 'idle';
+                this.dinosaurModel.setAttribute('animation-mixer', {
+                    clip: this.currentAnimation,
+                    timeScale: 1.5,
+                    loop: 'repeat'
+                });
+                console.log('Animation changed to:', this.currentAnimation); // デバッグ用
+            }, 5000);
+        }
         
         this.createShareModal();
         this.setupEventListeners();
