@@ -85,7 +85,9 @@ AFRAME.registerComponent('ar-controller', {
             // 元のgetCanvas関数を復元
             scene.components.screenshot.getCanvas = originalGetCanvas;
         });
+      
     }
+      
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
