@@ -46,26 +46,33 @@ AFRAME.registerComponent('ar-controller', {
     setupButtons: function() {
     if (this.captureButton) {
         this.captureButton.addEventListener('click', async () => {
-            const video = document.querySelector('video'); // MindARカメラ映像
-            const sceneCanvas = document.querySelector('canvas'); // A-Frameシーン
-
-            // キャンバスを作成
+            const scene = document.querySelector('a-scene');
+            // まず、A-Frameのスクリーンショットコンポーネントを呼び出して3Dシーンのキャンバスを確保
+            // ※注意：レンダラーがpreserveDrawingBuffer: trueなら、キャンバスの内容が保持されます。
+            scene.components.screenshot.capture('perspective');
+            const sceneCanvas = scene.components.screenshot.getCanvas('perspective');
+            
+            // MindARのカメラ映像を取得（通常、ARシーンには <video> 要素があるのでこれでOK）
+            const video = document.querySelector('video');
+            
+            // 最終的なキャプチャ用キャンバスを作成
             const finalCanvas = document.createElement('canvas');
-            const ctx = finalCanvas.getContext('2d');
-
-            // キャンバスサイズを設定
             finalCanvas.width = window.innerWidth;
             finalCanvas.height = window.innerHeight;
-
-            // 背景（カメラ映像）を描画
-            ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
-
-            // A-Frameシーン（3Dモデル）を重ねて描画
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-
-            // キャプチャした画像データをモーダルに表示
+            const ctx = finalCanvas.getContext('2d');
+            
+            // まず背景（カメラ映像）を描画
+            if (video) {
+                ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
+            }
+            // 次に3Dシーン（A-Frameのキャンバス）を重ねて描画
+            if (sceneCanvas) {
+                ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+            }
+            
+            // 最終画像をデータURLに変換し、モーダルに表示
             this.capturedImage.src = finalCanvas.toDataURL('image/png');
+            // モーダルを表示（クラス "hidden" を外す）
             this.shareModal.classList.remove('hidden');
         });
     }

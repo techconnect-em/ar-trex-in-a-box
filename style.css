@@ -98,12 +98,11 @@ a-scene {
 
 .share-modal {
     position: fixed;
-    top: 50%; /* 画面中央 */
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* 中央揃え */
+    transform: translate(-50%, -50%);
     width: 90%;
     max-width: 400px;
-    height: auto;
     background: rgba(255, 255, 255, 1);
     display: flex;
     flex-direction: column;
