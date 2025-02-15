@@ -1,56 +1,55 @@
-AFRAME.registerComponent('ar-controller', {
-    init: function() {
-        this.scanningOverlay = document.getElementById('scanning-overlay');
-        this.captureButton = document.getElementById('capture');
-        this.websiteButton = document.getElementById('website-button');
-        this.releaseButton = document.getElementById('release-button');
-        this.dinosaurModel = this.el.querySelector('#dinosaur');
-       // アニメーション設定をオブジェクトの配列として管理
-        this.animations = [
-            { clip: 'idle', duration: 7000, timeScale: 1.5 },
-            { clip: 'roar', duration: 5000, timeScale: 1 },
-            { clip: 'attack_tail', duration: 4700, timeScale: 1 }
-        ];
-        this.currentIndex = 0;
-        
-        if (this.dinosaurModel) {
-            this.playNextAnimation();
-        }
-    },
+AFRAME.registerComponent("ar-controller", {
+  init: function () {
+    this.scanningOverlay = document.getElementById("scanning-overlay");
+    this.captureButton = document.getElementById("capture");
+    this.websiteButton = document.getElementById("website-button");
+    this.releaseButton = document.getElementById("release-button");
+    this.dinosaurModel = this.el.querySelector("#dinosaur");
+    // アニメーション設定をオブジェクトの配列として管理
+    this.animations = [
+      { clip: "idle", duration: 7000, timeScale: 1.5 },
+      { clip: "roar", duration: 6000, timeScale: 1 },
+      { clip: "attack_tail", duration: 4800, timeScale: 1 },
+    ];
+    this.currentIndex = 0;
 
-    playNextAnimation: function() {
-        const currentAnim = this.animations[this.currentIndex];
-        
-        // 現在のアニメーションを設定
-        this.dinosaurModel.setAttribute('animation-mixer', {
-            clip: currentAnim.clip,
-            timeScale: currentAnim.timeScale,
-            loop: 'repeat'
-        });
-        
-        // 次のアニメーションのタイマーをセット
-        setTimeout(() => {
-            this.currentIndex = (this.currentIndex + 1) % this.animations.length;
-            this.playNextAnimation();
-        }, currentAnim.duration);
-  
-        
-        this.createShareModal();
-        this.setupEventListeners();
-        this.setupButtons();
-    },
-  
-    setupEventListeners: function() {
-        this.el.addEventListener('targetFound', () => {
-            console.log('マーカーを認識しました');
-            if (this.scanningOverlay) {
-                this.scanningOverlay.style.display = 'none';
-            }
-        });
-    },
+    if (this.dinosaurModel) {
+      this.playNextAnimation();
+    }
+  },
 
-    createShareModal: function() {
-        const modalHTML = `
+  playNextAnimation: function () {
+    const currentAnim = this.animations[this.currentIndex];
+
+    // 現在のアニメーションを設定
+    this.dinosaurModel.setAttribute("animation-mixer", {
+      clip: currentAnim.clip,
+      timeScale: currentAnim.timeScale,
+      loop: "repeat",
+    });
+
+    // 次のアニメーションのタイマーをセット
+    setTimeout(() => {
+      this.currentIndex = (this.currentIndex + 1) % this.animations.length;
+      this.playNextAnimation();
+    }, currentAnim.duration);
+
+    this.createShareModal();
+    this.setupEventListeners();
+    this.setupButtons();
+  },
+
+  setupEventListeners: function () {
+    this.el.addEventListener("targetFound", () => {
+      console.log("マーカーを認識しました");
+      if (this.scanningOverlay) {
+        this.scanningOverlay.style.display = "none";
+      }
+    });
+  },
+
+  createShareModal: function () {
+    const modalHTML = `
             <div id="share-modal" class="share-modal hidden">
                 <div class="modal-content">
                     <div class="image-container">
@@ -64,86 +63,91 @@ AFRAME.registerComponent('ar-controller', {
                 </div>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
 
-        this.shareModal = document.getElementById('share-modal');
-        this.capturedImage = document.getElementById('captured-image');
-        this.shareButton = document.getElementById('share-button');
-        this.closeModal = document.getElementById('close-modal');
-    },
+    this.shareModal = document.getElementById("share-modal");
+    this.capturedImage = document.getElementById("captured-image");
+    this.shareButton = document.getElementById("share-button");
+    this.closeModal = document.getElementById("close-modal");
+  },
 
-    setupButtons: function() {
+  setupButtons: function () {
     if (this.captureButton) {
-        this.captureButton.addEventListener('click', async () => {
-            const scene = document.querySelector('a-scene');
+      this.captureButton.addEventListener("click", async () => {
+        const scene = document.querySelector("a-scene");
 
-            // キャプチャ前にデフォルトのダウンロード動作を防ぐための設定
-            const originalGetCanvas = scene.components.screenshot.getCanvas;
-            scene.components.screenshot.getCanvas = function() {
-                const canvas = originalGetCanvas.apply(this, arguments);
-                // デフォルトのダウンロードポップアップを防ぐ
-                canvas.toBlob = function() {};
-                return canvas;
-            };
+        // キャプチャ前にデフォルトのダウンロード動作を防ぐための設定
+        const originalGetCanvas = scene.components.screenshot.getCanvas;
+        scene.components.screenshot.getCanvas = function () {
+          const canvas = originalGetCanvas.apply(this, arguments);
+          // デフォルトのダウンロードポップアップを防ぐ
+          canvas.toBlob = function () {};
+          return canvas;
+        };
 
-            // A-Frameシーンのスクリーンショットを取得
-            const sceneCanvas = scene.components.screenshot.getCanvas('perspective');
+        // A-Frameシーンのスクリーンショットを取得
+        const sceneCanvas =
+          scene.components.screenshot.getCanvas("perspective");
 
-            const video = document.querySelector('video');
+        const video = document.querySelector("video");
 
-            // 最終的なキャプチャ用キャンバスを作成
-            const finalCanvas = document.createElement('canvas');
-            finalCanvas.width = window.innerWidth;
-            finalCanvas.height = window.innerHeight;
-            const ctx = finalCanvas.getContext('2d');
+        // 最終的なキャプチャ用キャンバスを作成
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = window.innerWidth;
+        finalCanvas.height = window.innerHeight;
+        const ctx = finalCanvas.getContext("2d");
 
-            // 背景（カメラ映像）を描画
-            if (video) {
-                ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
-            }
-
-            // A-Frameシーン（3Dモデル）を重ねて描画
-            if (sceneCanvas) {
-                ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-            }
-
-            // キャプチャした画像データをモーダルに表示
-            this.capturedImage.src = finalCanvas.toDataURL('image/png');
-            this.shareModal.classList.remove('hidden');
-
-            // 元のgetCanvas関数を復元
-            scene.components.screenshot.getCanvas = originalGetCanvas;
-        });
-      
-    }
-      
-
-        // Webサイトボタンの処理
-        if (this.websiteButton) {
-            this.websiteButton.addEventListener('click', () => {
-                window.open('https://www.instagram.com/techconnect.em/', '_blank');
-            });
+        // 背景（カメラ映像）を描画
+        if (video) {
+          ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
         }
 
-        // 外に出すボタンの処理
-        if (this.releaseButton) {
-            this.releaseButton.addEventListener('click', () => {
-                if (this.dinosaurModel) {
-                    this.dinosaurModel.setAttribute('animation__scale', {
-                        property: 'scale',
-                        to: '2 2 2',
-                        dur: 1500,
-                        easing: 'easeOutElastic'
-                    });
-                    
-                    this.dinosaurModel.setAttribute('animation__position', {
-                        property: 'position',
-                        to: '0 0 -2',
-                        dur: 1500,
-                        easing: 'easeOutQuad'
-                    });
-                }
-            });
+        // A-Frameシーン（3Dモデル）を重ねて描画
+        if (sceneCanvas) {
+          ctx.drawImage(
+            sceneCanvas,
+            0,
+            0,
+            finalCanvas.width,
+            finalCanvas.height
+          );
         }
+
+        // キャプチャした画像データをモーダルに表示
+        this.capturedImage.src = finalCanvas.toDataURL("image/png");
+        this.shareModal.classList.remove("hidden");
+
+        // 元のgetCanvas関数を復元
+        scene.components.screenshot.getCanvas = originalGetCanvas;
+      });
     }
+
+    // Webサイトボタンの処理
+    if (this.websiteButton) {
+      this.websiteButton.addEventListener("click", () => {
+        window.open("https://www.instagram.com/techconnect.em/", "_blank");
+      });
+    }
+
+    // 外に出すボタンの処理
+    if (this.releaseButton) {
+      this.releaseButton.addEventListener("click", () => {
+        if (this.dinosaurModel) {
+          this.dinosaurModel.setAttribute("animation__scale", {
+            property: "scale",
+            to: "2 2 2",
+            dur: 1500,
+            easing: "easeOutElastic",
+          });
+
+          this.dinosaurModel.setAttribute("animation__position", {
+            property: "position",
+            to: "0 0 -2",
+            dur: 1500,
+            easing: "easeOutQuad",
+          });
+        }
+      });
+    }
+  },
 });
