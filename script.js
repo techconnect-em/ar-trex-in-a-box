@@ -1,41 +1,69 @@
 AFRAME.registerComponent('ar-controller', {
     init: function() {
-        // 要素の参照を取得
         this.scanningOverlay = document.getElementById('scanning-overlay');
         this.captureButton = document.getElementById('capture');
         this.websiteButton = document.getElementById('website-button');
         this.releaseButton = document.getElementById('release-button');
         this.dinosaurModel = this.el.querySelector('#dinosaur');
         
-        // イベントリスナーのセットアップ
+        this.createShareModal();
         this.setupEventListeners();
         this.setupButtons();
     },
 
-    setupEventListeners: function() {
-        this.el.addEventListener('targetFound', () => {
-            console.log('マーカーを認識しました');
-            if (this.scanningOverlay) {
-                this.scanningOverlay.style.display = 'none';
-            }
-        });
+    createShareModal: function() {
+        const modalHTML = `
+            <div id="share-modal" class="share-modal hidden">
+                <div class="modal-content">
+                    <div class="image-container">
+                        <img id="captured-image" class="captured-image">
+                    </div>
+                    <p class="save-text">画像長押しで保存できます</p>
+                    <div class="modal-buttons">
+                        <button id="share-button" class="modal-btn share-btn">共有する</button>
+                        <button id="close-modal" class="modal-btn close-btn">閉じる</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        this.shareModal = document.getElementById('share-modal');
+        this.capturedImage = document.getElementById('captured-image');
+        this.shareButton = document.getElementById('share-button');
+        this.closeModal = document.getElementById('close-modal');
     },
 
     setupButtons: function() {
-        // 撮影ボタンの処理
         if (this.captureButton) {
-            this.captureButton.addEventListener('click', () => {
-                console.log('写真を撮影します');
+            this.captureButton.addEventListener('click', async () => {
+                // シーン全体をキャプチャ
                 const scene = document.querySelector('a-scene');
-                const img = scene.components.screenshot.getCanvas('perspective');
                 
-                // 画像をダウンロード
-                const link = document.createElement('a');
-                link.download = 'ar-dinosaur.png';
-                link.href = img.toDataURL('image/png');
-                link.click();
+                // スクリーンショットを取得
+                const canvas = scene.components.screenshot.getCanvas('perspective');
+                
+                // キャンバスのアスペクト比を調整
+                const aspectRatio = window.innerHeight / window.innerWidth;
+                const finalCanvas = document.createElement('canvas');
+                const ctx = finalCanvas.getContext('2d');
+                
+                finalCanvas.width = window.innerWidth;
+                finalCanvas.height = window.innerHeight;
+                
+                // 背景色を設定（透明にする場合は不要）
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // 元のキャンバスを描画
+                ctx.drawImage(canvas, 0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // 調整したキャンバスの内容をモーダルに表示
+                this.capturedImage.src = finalCanvas.toDataURL('image/png');
+                this.shareModal.classList.remove('hidden');
             });
         }
+    },
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
