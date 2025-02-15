@@ -5,21 +5,35 @@ AFRAME.registerComponent('ar-controller', {
         this.websiteButton = document.getElementById('website-button');
         this.releaseButton = document.getElementById('release-button');
         this.dinosaurModel = this.el.querySelector('#dinosaur');
-       if (this.dinosaurModel) {
-            // 初期アニメーションを設定
-            this.currentAnimation = 'idle';
-            
-            // 3秒ごとにアニメーションを切り替え
-            setInterval(() => {
-                this.currentAnimation = this.currentAnimation === 'idle' ? 'attack_tail' : 'idle';
-                this.dinosaurModel.setAttribute('animation-mixer', {
-                    clip: this.currentAnimation,
-                    timeScale: 1.5,
-                    loop: 'repeat'
-                });
-                console.log('Animation changed to:', this.currentAnimation); // デバッグ用
-            }, 5000);
+       // アニメーション設定をオブジェクトの配列として管理
+        this.animations = [
+            { clip: 'idle', duration: 7000, timeScale: 1.5 },
+            { clip: 'roar', duration: 5000, timeScale: 1 },
+            { clip: 'attack_tail', duration: 4700, timeScale: 1 }
+        ];
+        this.currentIndex = 0;
+        
+        if (this.dinosaurModel) {
+            this.playNextAnimation();
         }
+    },
+
+    playNextAnimation: function() {
+        const currentAnim = this.animations[this.currentIndex];
+        
+        // 現在のアニメーションを設定
+        this.dinosaurModel.setAttribute('animation-mixer', {
+            clip: currentAnim.clip,
+            timeScale: currentAnim.timeScale,
+            loop: 'repeat'
+        });
+        
+        // 次のアニメーションのタイマーをセット
+        setTimeout(() => {
+            this.currentIndex = (this.currentIndex + 1) % this.animations.length;
+            this.playNextAnimation();
+        }, currentAnim.duration);
+  
         
         this.createShareModal();
         this.setupEventListeners();
