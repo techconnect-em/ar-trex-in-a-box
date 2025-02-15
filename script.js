@@ -10,6 +10,15 @@ AFRAME.registerComponent('ar-controller', {
         this.setupEventListeners();
         this.setupButtons();
     },
+  
+    setupEventListeners: function() {
+        this.el.addEventListener('targetFound', () => {
+            console.log('マーカーを認識しました');
+            if (this.scanningOverlay) {
+                this.scanningOverlay.style.display = 'none';
+            }
+        });
+    },
 
     createShareModal: function() {
         const modalHTML = `
@@ -35,15 +44,11 @@ AFRAME.registerComponent('ar-controller', {
     },
 
     setupButtons: function() {
+        // 撮影ボタンの処理
         if (this.captureButton) {
             this.captureButton.addEventListener('click', async () => {
-                // シーン全体をキャプチャ
                 const scene = document.querySelector('a-scene');
-                
-                // スクリーンショットを取得
                 const canvas = scene.components.screenshot.getCanvas('perspective');
-                
-                // キャンバスのアスペクト比を調整
                 const aspectRatio = window.innerHeight / window.innerWidth;
                 const finalCanvas = document.createElement('canvas');
                 const ctx = finalCanvas.getContext('2d');
@@ -51,19 +56,14 @@ AFRAME.registerComponent('ar-controller', {
                 finalCanvas.width = window.innerWidth;
                 finalCanvas.height = window.innerHeight;
                 
-                // 背景色を設定（透明にする場合は不要）
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                
-                // 元のキャンバスを描画
                 ctx.drawImage(canvas, 0, 0, finalCanvas.width, finalCanvas.height);
                 
-                // 調整したキャンバスの内容をモーダルに表示
                 this.capturedImage.src = finalCanvas.toDataURL('image/png');
                 this.shareModal.classList.remove('hidden');
             });
         }
-    },
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
@@ -72,11 +72,9 @@ AFRAME.registerComponent('ar-controller', {
             });
         }
 
-        // 外に出すボタンの処理（基本実装）
+        // 外に出すボタンの処理
         if (this.releaseButton) {
             this.releaseButton.addEventListener('click', () => {
-                // TODO: AR平面認識への切り替え処理
-                // まずは単純な拡大アニメーションを実装
                 if (this.dinosaurModel) {
                     this.dinosaurModel.setAttribute('animation__scale', {
                         property: 'scale',
