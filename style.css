@@ -28,7 +28,6 @@ a-scene {
     transition: opacity 0.3s ease;
 }
 
-/* 非表示用のクラス */
 .hidden {
     opacity: 0 !important;
     pointer-events: none;

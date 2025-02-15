@@ -4,6 +4,7 @@ AFRAME.registerComponent('ar-controller', {
         this.debugEl = document.getElementById('debug');
         this.releaseButton = document.getElementById('release-button');
         this.captureButton = document.getElementById('capture');
+        this.scanningOverlay = document.getElementById('scanning-overlay'); // 追加
         this.isLargeSize = false;
         
         this.setupModelHandlers();
@@ -11,6 +12,7 @@ AFRAME.registerComponent('ar-controller', {
         this.setupButtons();
     },
 
+  
     setupModelHandlers: function() {
         // モデルのロード完了時の処理
         this.model.addEventListener('model-loaded', () => {
@@ -60,13 +62,18 @@ AFRAME.registerComponent('ar-controller', {
         });
     },
 
-    setupEventListeners: function() {
+ setupEventListeners: function() {
         this.el.addEventListener('targetFound', () => {
             this.updateDebug('マーカーを認識しました');
             this.model.setAttribute('visible', true);
             
             // アニメーションを再開
             this.model.components['animation-mixer'].play();
+
+            // スキャンオーバーレイを非表示
+            if (this.scanningOverlay) {
+                this.scanningOverlay.classList.add('hidden');
+            }
         });
 
         this.el.addEventListener('targetLost', () => {
@@ -126,10 +133,5 @@ AFRAME.registerComponent('ar-controller', {
         }
     },
 
-    updateDebug: function(message) {
-        if (this.debugEl) {
-            this.debugEl.innerHTML += `<div>${message}</div>`;
-            console.log(message);
-        }
-    }
+
 });
