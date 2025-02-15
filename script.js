@@ -47,38 +47,45 @@ AFRAME.registerComponent('ar-controller', {
     if (this.captureButton) {
         this.captureButton.addEventListener('click', async () => {
             const scene = document.querySelector('a-scene');
-            // まず、A-Frameのスクリーンショットコンポーネントを呼び出して3Dシーンのキャンバスを確保
-            // ※注意：レンダラーがpreserveDrawingBuffer: trueなら、キャンバスの内容が保持されます。
-            scene.components.screenshot.capture('perspective');
+
+            // キャプチャ前にデフォルトのダウンロード動作を防ぐための設定
+            const originalGetCanvas = scene.components.screenshot.getCanvas;
+            scene.components.screenshot.getCanvas = function() {
+                const canvas = originalGetCanvas.apply(this, arguments);
+                // デフォルトのダウンロードポップアップを防ぐ
+                canvas.toBlob = function() {};
+                return canvas;
+            };
+
+            // A-Frameシーンのスクリーンショットを取得
             const sceneCanvas = scene.components.screenshot.getCanvas('perspective');
-            
-            // MindARのカメラ映像を取得（通常、ARシーンには <video> 要素があるのでこれでOK）
+
             const video = document.querySelector('video');
-            
+
             // 最終的なキャプチャ用キャンバスを作成
             const finalCanvas = document.createElement('canvas');
             finalCanvas.width = window.innerWidth;
             finalCanvas.height = window.innerHeight;
             const ctx = finalCanvas.getContext('2d');
-            
-            // まず背景（カメラ映像）を描画
+
+            // 背景（カメラ映像）を描画
             if (video) {
                 ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
             }
-            // 次に3Dシーン（A-Frameのキャンバス）を重ねて描画
+
+            // A-Frameシーン（3Dモデル）を重ねて描画
             if (sceneCanvas) {
                 ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
             }
-            
-            // 最終画像をデータURLに変換し、モーダルに表示
+
+            // キャプチャした画像データをモーダルに表示
             this.capturedImage.src = finalCanvas.toDataURL('image/png');
-            // モーダルを表示（クラス "hidden" を外す）
             this.shareModal.classList.remove('hidden');
+
+            // 元のgetCanvas関数を復元
+            scene.components.screenshot.getCanvas = originalGetCanvas;
         });
     }
-
-
-
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
