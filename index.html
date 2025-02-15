@@ -13,15 +13,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-      <div class="buttons">
-        <button class="button" id="release-button">箱から出す</button>
-        <button class="button" id="capture">写真を撮る</button>
-    </div>
-    <script src="script.js"></script>
-  
+       
    <a-scene
         mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
-        color-space="sRGB"
+        embedded
+            color-space="sRGB"
         renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false">
@@ -70,6 +66,11 @@
             </a-entity>
         </a-entity>
     </a-scene>
+  <div class="buttons">
+        <button class="button" id="release-button">箱から出す</button>
+        <button class="button" id="capture">写真を撮る</button>
+    </div>
+    <script src="script.js"></script>
 
 </body>
 </html>
