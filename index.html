@@ -10,15 +10,19 @@
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-       
+     <div class="example-container">  
    <a-scene
         mindar-image="imageTargetSrc: https://cdn.glitch.global/5e45a02f-1793-4d54-b2c7-ac4d29a43d33/targets.mind?v=1739155705813;"
         embedded
-            color-space="sRGB"
-        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+        color-space="sRGB"
+        renderer="colorManagement: true; physicallyCorrectLights: true;"
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false">
         <a-assets>
@@ -66,10 +70,19 @@
             </a-entity>
         </a-entity>
     </a-scene>
+  </div>
+  
+  <div id="scanning-overlay">箱の中をスキャンしてください</div>
+  
   <div class="buttons">
-        <button class="button" id="release-button">箱から出す</button>
-        <button class="button" id="capture">写真を撮る</button>
-    </div>
+    <button class="button" id="release-button">
+        <i class="fas fa-box-open"></i>
+    </button>
+    <button class="button" id="capture">
+        <i class="fas fa-camera"></i>
+    </button>
+</div>
+  
     <script src="script.js"></script>
 
 </body>
