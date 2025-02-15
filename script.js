@@ -175,23 +175,9 @@ AFRAME.registerComponent("ar-controller", {
 
     // 外に出すボタンの処理
     if (this.releaseButton) {
-      this.releaseButton.addEventListener("click", () => {
-        if (this.dinosaurModel) {
-          this.dinosaurModel.setAttribute("animation__scale", {
-            property: "scale",
-            to: "2 2 2",
-            dur: 1500,
-            easing: "easeOutElastic",
-          });
-
-          this.dinosaurModel.setAttribute("animation__position", {
-            property: "position",
-            to: "0 0 -2",
-            dur: 1500,
-            easing: "easeOutQuad",
-          });
-        }
-      });
-    }
+    this.releaseButton.addEventListener('click', () => {
+        window.location.href = 'https://palanar.com/ar_contents/t-rex-running';
+    });
+}
   },
 });
