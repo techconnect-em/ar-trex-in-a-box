@@ -46,20 +46,22 @@ AFRAME.registerComponent('ar-controller', {
     setupButtons: function() {
     if (this.captureButton) {
         this.captureButton.addEventListener('click', async () => {
-            const scene = document.querySelector('.example-container'); // AR全体コンテナ
             const video = document.querySelector('video'); // MindARカメラ映像
+            const sceneCanvas = document.querySelector('canvas'); // A-Frameシーン
 
+            // キャンバスを作成
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
 
+            // キャンバスサイズを設定
             finalCanvas.width = window.innerWidth;
             finalCanvas.height = window.innerHeight;
 
             // 背景（カメラ映像）を描画
             ctx.drawImage(video, 0, 0, finalCanvas.width, finalCanvas.height);
 
-            // A-Frameシーンをキャプチャ
-            const sceneCanvas = scene.querySelector('canvas');
+            // A-Frameシーン（3Dモデル）を重ねて描画
+            ctx.globalCompositeOperation = 'source-over';
             ctx.drawImage(sceneCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
 
             // キャプチャした画像データをモーダルに表示
@@ -67,7 +69,9 @@ AFRAME.registerComponent('ar-controller', {
             this.shareModal.classList.remove('hidden');
         });
     }
-}
+
+
+
 
         // Webサイトボタンの処理
         if (this.websiteButton) {
