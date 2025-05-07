@@ -21,10 +21,17 @@
 <body>
      <div class="example-container">  
    <a-scene
-    mindar-image="imageTargetSrc: https://cdn.glitch.global/900fa12a-e435-49d1-8491-ff87a0daf76d/targets.mind?v=1739973630297"
+    mindar-image="imageTargetSrc: https://cdn.glitch.global/900fa12a-e435-49d1-8491-ff87a0daf76d/targets.mind?v=1739973630297;
+                  filterMinCF: 0.0001;
+                filterBeta: 0.07;
+                missTolerance: 5;
+                warmupTolerance: 5;
+                matrixInterpolation: true"
     embedded
     color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true; preserveDrawingBuffer: true; antialias: true;"
+    renderer="colorManagement: true; physicallyCorrectLights: true; preserveDrawingBuffer: true; antialias: true;
+              toneMapping: ACESFilmic; exposure: 1.6;
+           preserveDrawingBuffer: true; antialias: true;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
         <a-assets>
