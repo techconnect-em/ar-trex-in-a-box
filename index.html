@@ -66,10 +66,15 @@
     <a-entity
         id="dinosaur"
         gltf-model="#dinosaur-model"
-        animation-mixer="clip: *; timeScale: 1.5; loop: repeat"
-        position="-0.2 -0.2 -2"
-        scale="0.005 0.005 0.005"
+        animation-mixer="clip: idle; timeScale: 1.5; loop: repeat"
+        position="-0.2 -0.5 -0.2"
+        scale="0.25 0.25 0.25"
         rotation="0 45 0"
+        material="shader: standard; 
+                 roughness: 0.7; 
+                 metalness: 0.1;
+                 normalScale: 1 1;
+                 envMapIntensity: 1;"
         shadow="cast: true; receive: true">
     </a-entity>
 </a-entity>
