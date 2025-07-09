@@ -22,12 +22,10 @@ AFRAME.registerComponent("ar-controller", {
       lastFeedTime: Date.now()
     };
     
-    // 音響効果（振動のみ）
-    this.soundEffects = {
-      roar: true,
-      footstep: true,
-      eating: true
-    };
+    // 音響効果システム
+    this.audioContext = null;
+    this.audioInitialized = false;
+    this.initAudioOnFirstInteraction();
     
     // アニメーション設定をオブジェクトの配列として管理
     this.animations = [
@@ -80,10 +78,85 @@ AFRAME.registerComponent("ar-controller", {
     this.setupButtons();
   },
   
-  // 音響効果は完全に無効化
-  // playSound: function(soundName) {
-  //   // 音響効果は無効化されました
-  // },
+  // オーディオ初期化
+  initAudioOnFirstInteraction: function() {
+    const initAudio = () => {
+      if (!this.audioInitialized) {
+        try {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+          }
+          this.audioInitialized = true;
+          console.log('🔊 Audio initialized');
+        } catch (error) {
+          console.log('Audio initialization error:', error);
+        }
+      }
+    };
+    
+    // 最初のクリック/タッチでオーディオを初期化
+    document.body.addEventListener('click', initAudio, { once: true });
+    document.body.addEventListener('touchstart', initAudio, { once: true });
+  },
+
+  // 効果音の再生
+  playEffectSound: function(soundType) {
+    // 音響システムが初期化されていない場合は初期化を試行
+    if (!this.audioInitialized) {
+      try {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume();
+        }
+        this.audioInitialized = true;
+        console.log('🔊 Audio initialized on sound play');
+      } catch (error) {
+        console.log('Audio initialization error:', error);
+        return;
+      }
+    }
+    
+    if (!this.audioContext || !this.audioInitialized) return;
+    
+    try {
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      switch(soundType) {
+        case 'heart':
+          // ハートエフェクト用の優しい音
+          oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime); // C5
+          oscillator.frequency.exponentialRampToValueAtTime(659, this.audioContext.currentTime + 0.1); // E5
+          oscillator.frequency.exponentialRampToValueAtTime(784, this.audioContext.currentTime + 0.2); // G5
+          gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+          oscillator.type = 'sine';
+          oscillator.start();
+          oscillator.stop(this.audioContext.currentTime + 0.5);
+          break;
+          
+        case 'eating':
+          // 餌やり用の上昇音（ハートとは違う音階）
+          oscillator.frequency.setValueAtTime(220, this.audioContext.currentTime); // A3
+          oscillator.frequency.exponentialRampToValueAtTime(294, this.audioContext.currentTime + 0.1); // D4
+          oscillator.frequency.exponentialRampToValueAtTime(392, this.audioContext.currentTime + 0.2); // G4
+          oscillator.frequency.exponentialRampToValueAtTime(523, this.audioContext.currentTime + 0.3); // C5
+          gainNode.gain.setValueAtTime(0.18, this.audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+          oscillator.type = 'triangle';
+          oscillator.start();
+          oscillator.stop(this.audioContext.currentTime + 0.5);
+          break;
+      }
+      
+    } catch (error) {
+      console.log("Sound error:", error);
+    }
+  },
   
   // T-Rex の餌やり機能
   feedTrex: function() {
@@ -107,6 +180,9 @@ AFRAME.registerComponent("ar-controller", {
     
     // 餌やりエフェクトの表示（肉エモジのみ）
     this.showFeedingEffect();
+    
+    // 餌やり効果音の再生
+    this.playEffectSound('eating');
     
     // ステータスパネルの表示
     this.statusPanel.classList.add('visible');
@@ -173,30 +249,43 @@ AFRAME.registerComponent("ar-controller", {
   
   // ステータス表示の更新
   updateStatusDisplay: function() {
+    // デバッグ情報を表示
+    console.log(`📊 Status Update: Happiness=${this.trexStatus.happiness}, Hunger=${this.trexStatus.hunger}, FeedCount=${this.trexStatus.feedCount}`);
+    
     // 幸福度の表示
     if (this.trexStatus.happiness > 80) {
       this.happinessLevel.textContent = '😄';
+      console.log('😄 Very Happy');
     } else if (this.trexStatus.happiness > 60) {
       this.happinessLevel.textContent = '😊';
+      console.log('😊 Happy');
     } else if (this.trexStatus.happiness > 40) {
       this.happinessLevel.textContent = '😐';
+      console.log('😐 Neutral');
     } else if (this.trexStatus.happiness > 20) {
       this.happinessLevel.textContent = '😢';
+      console.log('😢 Sad');
     } else {
       this.happinessLevel.textContent = '😭';
+      console.log('😭 Very Sad');
     }
     
     // 空腹度の表示
     if (this.trexStatus.hunger > 80) {
       this.hungerLevel.textContent = '🍖🍖🍖';
+      console.log('🍖🍖🍖 Very Full');
     } else if (this.trexStatus.hunger > 60) {
       this.hungerLevel.textContent = '🍖🍖';
+      console.log('🍖🍖 Full');
     } else if (this.trexStatus.hunger > 40) {
       this.hungerLevel.textContent = '🍖';
+      console.log('🍖 Satisfied');
     } else if (this.trexStatus.hunger > 20) {
       this.hungerLevel.textContent = '🥩';
+      console.log('🥩 Hungry');
     } else {
       this.hungerLevel.textContent = '💀';
+      console.log('💀 Starving');
     }
     
     // 餌やり回数
@@ -320,6 +409,9 @@ AFRAME.registerComponent("ar-controller", {
     
     // ハートエフェクト
     this.showHeartEffect();
+    
+    // ハート効果音の再生
+    this.playEffectSound('heart');
     
     // 一時的にステータス表示
     this.statusPanel.classList.add('visible');
