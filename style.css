@@ -41,9 +41,10 @@ a-scene {
   display: flex;
   justify-content: center; /* 中央揃え */
   align-items: center;
-  gap: 20px; /* ボタン間の間隔 */
+  gap: 15px; /* ボタン間の間隔を少し縮める */
   z-index: 1000;
   pointer-events: auto;
+  flex-wrap: wrap; /* ボタンが多い場合の折り返し */
 }
 /* 撮影ボタン */
 #capture {
@@ -184,4 +185,120 @@ a-scene {
 /* ボタンのアクティブ効果を追加 */
 .modal-btn:active {
   transform: scale(0.98);
+}
+
+/* 餌やりボタンのスタイル */
+#feed-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 165, 0, 0.9); /* オレンジ色 */
+  color: white;
+  border: 2px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+#feed-button:hover {
+  background-color: rgba(255, 140, 0, 0.9);
+  transform: scale(1.05);
+}
+
+/* T-Rex ステータスパネル */
+.status-panel {
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 1000;
+  font-size: 14px;
+  min-width: 180px;
+  display: none; /* 初期状態では非表示 */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-panel.visible {
+  display: block;
+  animation: slideIn 0.3s ease-out;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-item i {
+  width: 16px;
+  font-size: 14px;
+  color: #ffd700;
+}
+
+/* 餌やりエフェクトアニメーション */
+@keyframes feedingEffect {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.8) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.feeding-effect {
+  position: absolute;
+  pointer-events: none;
+  font-size: 24px;
+  animation: feedingEffect 1.5s ease-out forwards;
+  z-index: 1500;
+}
+
+/* スライドインアニメーション */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* パーティクルエフェクト */
+.particle {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 1500;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
 }

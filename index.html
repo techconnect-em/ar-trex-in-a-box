@@ -36,6 +36,17 @@
     device-orientation-permission-ui="enabled: false">
         <a-assets>
             <a-asset-item id="dinosaur-model" src="./assets/trex_running_loop.glb"></a-asset-item>
+            <!-- 音響効果用のオーディオファイル -->
+            <audio id="roar-sound" preload="auto">
+                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+                <!-- フォールバック：ローカル音源がない場合のデフォルト音 -->
+            </audio>
+            <audio id="footstep-sound" preload="auto">
+                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+            </audio>
+            <audio id="eating-sound" preload="auto">
+                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+            </audio>
         </a-assets>
         <!-- 強化されたライティング設定 -->
         <!-- 環境光 - 全体的な明るさ -->
@@ -84,6 +95,9 @@
   <div id="scanning-overlay">箱の中をスキャンしてください</div>
   
   <div class="buttons">
+        <button class="button" id="feed-button">
+            <i class="fas fa-drumstick-bite"></i> 餌やり
+        </button>
         <button class="button" id="release-button">外に出す</button>
         <button class="button" id="capture">
         <i class="fas fa-camera"></i>
@@ -91,6 +105,21 @@
     <button class="button" id="website-button">
         <i class="fas fa-globe"></i>
       </button>
+    </div>
+    
+    <!-- T-Rex ステータス表示 -->
+    <div id="trex-status" class="status-panel">
+        <div class="status-item">
+            <i class="fas fa-heart"></i>
+            <span id="happiness-level">😊</span>
+        </div>
+        <div class="status-item">
+            <i class="fas fa-drumstick-bite"></i>
+            <span id="hunger-level">🍖</span>
+        </div>
+        <div class="status-item">
+            餌やり回数: <span id="feed-count">0</span>
+        </div>
     </div>
     <script src="script.js"></script>
 
