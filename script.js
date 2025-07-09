@@ -6,6 +6,7 @@ AFRAME.registerComponent("ar-controller", {
     this.releaseButton = document.getElementById("release-button");
     this.feedButton = document.getElementById("feed-button");
     this.dinosaurModel = this.el.querySelector("#dinosaur");
+    console.log("Dinosaur model:", this.dinosaurModel);
     
     // T-Rex ステータス管理
     this.statusPanel = document.getElementById("trex-status");
@@ -21,11 +22,11 @@ AFRAME.registerComponent("ar-controller", {
       lastFeedTime: Date.now()
     };
     
-    // 音響効果
-    this.sounds = {
-      roar: document.getElementById("roar-sound"),
-      footstep: document.getElementById("footstep-sound"),
-      eating: document.getElementById("eating-sound")
+    // 音響効果（振動のみ）
+    this.soundEffects = {
+      roar: true,
+      footstep: true,
+      eating: true
     };
     
     // アニメーション設定をオブジェクトの配列として管理
@@ -38,12 +39,20 @@ AFRAME.registerComponent("ar-controller", {
     this.isFeeding = false;
 
     if (this.dinosaurModel) {
+      // モデルが読み込まれるまで待機
+      this.dinosaurModel.addEventListener('model-loaded', () => {
+        console.log('T-Rex model loaded');
+        this.playNextAnimation();
+      });
+      
+      // すでに読み込まれている場合もあるので、直接実行も試す
       this.playNextAnimation();
     }
     
     // ステータス更新タイマー
     this.startStatusUpdater();
   },
+  
 
   playNextAnimation: function () {
     const currentAnim = this.animations[this.currentIndex];
@@ -55,8 +64,8 @@ AFRAME.registerComponent("ar-controller", {
       loop: "repeat",
     });
     
-    // 音響効果の再生
-    this.playSound(currentAnim.sound);
+    // 音響効果は無効化
+    // this.playSound(currentAnim.sound);
 
     // 次のアニメーションのタイマーをセット
     setTimeout(() => {
@@ -71,19 +80,10 @@ AFRAME.registerComponent("ar-controller", {
     this.setupButtons();
   },
   
-  // 音響効果の再生
-  playSound: function(soundName) {
-    if (soundName && this.sounds[soundName]) {
-      try {
-        this.sounds[soundName].currentTime = 0;
-        this.sounds[soundName].play().catch(e => {
-          console.log("Sound play failed:", e);
-        });
-      } catch (error) {
-        console.log("Sound error:", error);
-      }
-    }
-  },
+  // 音響効果は完全に無効化
+  // playSound: function(soundName) {
+  //   // 音響効果は無効化されました
+  // },
   
   // T-Rex の餌やり機能
   feedTrex: function() {
@@ -102,10 +102,10 @@ AFRAME.registerComponent("ar-controller", {
       loop: "once",
     });
     
-    // 餌やり音の再生
-    this.playSound("eating");
+    // 餌やり音の再生は無効化
+    // this.playSound("eating");
     
-    // 餌やりエフェクトの表示
+    // 餌やりエフェクトの表示（肉エモジのみ）
     this.showFeedingEffect();
     
     // ステータスパネルの表示
@@ -230,58 +230,78 @@ AFRAME.registerComponent("ar-controller", {
       }
     });
     
-    // タッチ・スワイプインタラクション
+    // T-Rexモデルへの直接クリックイベント
+    if (this.dinosaurModel) {
+      console.log("Setting up T-Rex click listeners");
+      this.dinosaurModel.addEventListener('click', (e) => {
+        console.log('T-Rex clicked!');
+        this.petTrex();
+      });
+      
+      // A-Frameのカーソルイベントも追加
+      this.dinosaurModel.addEventListener('mouseenter', () => {
+        console.log('Mouse entered T-Rex');
+        this.dinosaurModel.setAttribute('material', 'color', '#ffeeaa');
+      });
+      
+      this.dinosaurModel.addEventListener('mouseleave', () => {
+        console.log('Mouse left T-Rex');
+        this.dinosaurModel.removeAttribute('material');
+      });
+    } else {
+      console.log("Dinosaur model not found!");
+    }
+    
+    // タッチインタラクション（タップのみ）
     this.setupTouchInteraction();
+    
+    // デバッグ用の全体クリックイベント
+    document.addEventListener('click', (e) => {
+      console.log('Global click detected at:', e.clientX, e.clientY);
+      
+      // 画面の中央付近をクリックした場合はT-Rexをタップしたとみなす
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      const centerX = screenWidth / 2;
+      const centerY = screenHeight / 2;
+      
+      // 中央から200px以内のクリックはT-Rexのタップとして処理
+      if (Math.abs(e.clientX - centerX) < 200 && Math.abs(e.clientY - centerY) < 200) {
+        console.log('T-Rex area clicked!');
+        this.petTrex();
+      }
+    });
   },
   
-  // タッチ・スワイプインタラクション
+  // タッチインタラクション（タップのみ）
   setupTouchInteraction: function() {
     const scene = document.querySelector('a-scene');
-    let touchStartX = 0;
-    let touchStartY = 0;
     let touchStartTime = 0;
     
     scene.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
       touchStartTime = Date.now();
     });
     
     scene.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
       const touchEndTime = Date.now();
-      
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
       const deltaTime = touchEndTime - touchStartTime;
       
-      // 長押し検出（1秒以上）
-      if (deltaTime > 1000 && Math.abs(deltaX) < 50 && Math.abs(deltaY) < 50) {
-        this.playSpecialDance();
-        return;
-      }
-      
-      // スワイプ検出（150px以上の移動）
-      if (Math.abs(deltaX) > 150 || Math.abs(deltaY) > 150) {
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          // 横スワイプ
-          if (deltaX > 0) {
-            this.turnTrex('right');
-          } else {
-            this.turnTrex('left');
-          }
-        } else {
-          // 縦スワイプ
-          if (deltaY > 0) {
-            this.makeTrexSit();
-          } else {
-            this.makeTrexRoar();
-          }
+      // 短いタップ（500ms以下）のみ処理
+      if (deltaTime < 500) {
+        console.log('Touch tap detected');
+        
+        // 中央付近のタップはT-Rexのタップとして処理
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const centerX = screenWidth / 2;
+        const centerY = screenHeight / 2;
+        
+        if (Math.abs(touchEndX - centerX) < 200 && Math.abs(touchEndY - centerY) < 200) {
+          console.log('T-Rex touch tap detected!');
+          this.petTrex();
         }
-      } else if (deltaTime < 500) {
-        // 短いタップ（500ms以下）
-        this.petTrex();
       }
     });
   },
@@ -310,98 +330,6 @@ AFRAME.registerComponent("ar-controller", {
     }, 3000);
   },
   
-  // T-Rexを回転させる（スワイプ）
-  turnTrex: function(direction) {
-    console.log(`T-Rex を${direction}に回転`);
-    const currentRotation = this.dinosaurModel.getAttribute('rotation');
-    const newY = direction === 'right' ? currentRotation.y + 90 : currentRotation.y - 90;
-    
-    this.dinosaurModel.setAttribute('animation', {
-      property: 'rotation',
-      to: `${currentRotation.x} ${newY} ${currentRotation.z}`,
-      dur: 1000,
-      easing: 'easeInOutQuad'
-    });
-    
-    this.playSound('footstep');
-  },
-  
-  // T-Rexを座らせる（下スワイプ）
-  makeTrexSit: function() {
-    console.log("T-Rex を座らせる");
-    const currentScale = this.dinosaurModel.getAttribute('scale');
-    
-    this.dinosaurModel.setAttribute('animation', {
-      property: 'scale',
-      to: `${currentScale.x} ${currentScale.y * 0.7} ${currentScale.z}`,
-      dur: 1000,
-      easing: 'easeInOutQuad'
-    });
-    
-    // 2秒後に元の大きさに戻す
-    setTimeout(() => {
-      this.dinosaurModel.setAttribute('animation', {
-        property: 'scale',
-        to: `${currentScale.x} ${currentScale.y} ${currentScale.z}`,
-        dur: 1000,
-        easing: 'easeInOutQuad'
-      });
-    }, 2000);
-  },
-  
-  // T-Rexを吠えさせる（上スワイプ）
-  makeTrexRoar: function() {
-    console.log("T-Rex を吠えさせる");
-    this.dinosaurModel.setAttribute("animation-mixer", {
-      clip: "roar",
-      timeScale: 1.5,
-      loop: "once",
-    });
-    
-    this.playSound('roar');
-    
-    // 画面振動効果（対応デバイスのみ）
-    if (navigator.vibrate) {
-      navigator.vibrate([100, 50, 100]);
-    }
-  },
-  
-  // 特別なダンス（長押し）
-  playSpecialDance: function() {
-    console.log("特別なダンスを開始");
-    this.trexStatus.happiness = Math.min(100, this.trexStatus.happiness + 15);
-    
-    // 連続アニメーション
-    const danceSequence = [
-      { clip: "attack_tail", duration: 1000 },
-      { clip: "roar", duration: 1000 },
-      { clip: "idle", duration: 1000 },
-      { clip: "attack_tail", duration: 1000 }
-    ];
-    
-    let currentStep = 0;
-    const executeDance = () => {
-      if (currentStep < danceSequence.length) {
-        const step = danceSequence[currentStep];
-        this.dinosaurModel.setAttribute("animation-mixer", {
-          clip: step.clip,
-          timeScale: 1.8,
-          loop: "once",
-        });
-        
-        currentStep++;
-        setTimeout(executeDance, step.duration);
-      } else {
-        // ダンス終了後に通常アニメーションに戻る
-        this.playNextAnimation();
-      }
-    };
-    
-    executeDance();
-    
-    // 特別なパーティクルエフェクト
-    this.showSpecialEffect();
-  },
   
   // ハートエフェクト
   showHeartEffect: function() {
@@ -421,26 +349,6 @@ AFRAME.registerComponent("ar-controller", {
     }
   },
   
-  // 特別なエフェクト（長押し時）
-  showSpecialEffect: function() {
-    const emojis = ['✨', '🌟', '💫', '🎉', '🎊'];
-    
-    for (let i = 0; i < 15; i++) {
-      setTimeout(() => {
-        const effect = document.createElement('div');
-        effect.className = 'feeding-effect';
-        effect.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        effect.style.left = (30 + Math.random() * 40) + '%';
-        effect.style.top = (30 + Math.random() * 40) + '%';
-        effect.style.fontSize = (20 + Math.random() * 10) + 'px';
-        document.body.appendChild(effect);
-        
-        setTimeout(() => {
-          document.body.removeChild(effect);
-        }, 1500);
-      }, i * 100);
-    }
-  },
 
   createShareModal: function () {
     const modalHTML = `
@@ -576,7 +484,8 @@ AFRAME.registerComponent("ar-controller", {
     
     // 餌やりボタンの処理
     if (this.feedButton) {
-      this.feedButton.addEventListener('click', () => {
+      this.feedButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // 他のクリックイベントを止める
         this.feedTrex();
       });
     }

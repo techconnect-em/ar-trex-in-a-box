@@ -189,8 +189,8 @@ a-scene {
 
 /* 餌やりボタンのスタイル */
 #feed-button {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background-color: rgba(255, 165, 0, 0.9); /* オレンジ色 */
   color: white;

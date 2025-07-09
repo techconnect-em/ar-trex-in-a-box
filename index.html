@@ -35,18 +35,11 @@
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <a-asset-item id="dinosaur-model" src="./assets/trex_running_loop.glb"></a-asset-item>
+            <a-asset-item id="dinosaur-model" src="./assets/Running_T-Rex.glb"></a-asset-item>
             <!-- 音響効果用のオーディオファイル -->
-            <audio id="roar-sound" preload="auto">
-                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
-                <!-- フォールバック：ローカル音源がない場合のデフォルト音 -->
-            </audio>
-            <audio id="footstep-sound" preload="auto">
-                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
-            </audio>
-            <audio id="eating-sound" preload="auto">
-                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
-            </audio>
+            <audio id="roar-sound" preload="auto" loop="false"></audio>
+            <audio id="footstep-sound" preload="auto" loop="false"></audio>
+            <audio id="eating-sound" preload="auto" loop="false"></audio>
         </a-assets>
         <!-- 強化されたライティング設定 -->
         <!-- 環境光 - 全体的な明るさ -->
@@ -72,7 +65,7 @@
                 groundColor="#b4a87e" 
                 intensity="0.5">
         </a-light>
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false" cursor="rayOrigin: mouse; fuse: false;" raycaster="objects: #dinosaur;"></a-camera>
      <a-entity mindar-image-target="targetIndex: 0" ar-controller>
     <a-entity
         id="dinosaur"
@@ -80,13 +73,7 @@
         animation-mixer="clip: idle; timeScale: 1.5; loop: repeat"
         position="-0.2 -0.5 -0.2"
         scale="0.25 0.25 0.25"
-        rotation="0 45 0"
-        material="shader: standard; 
-                 roughness: 0.7; 
-                 metalness: 0.1;
-                 normalScale: 1 1;
-                 envMapIntensity: 1;"
-        shadow="cast: true; receive: true">
+        rotation="0 45 0">
     </a-entity>
 </a-entity>
     </a-scene>
