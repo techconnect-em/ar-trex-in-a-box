@@ -83,11 +83,14 @@
         </button>
         <button class="button" id="release-button">外に出す</button>
         <button class="button" id="capture">
-        <i class="fas fa-camera"></i>
-    </button>
-    <button class="button" id="website-button">
-        <i class="fas fa-globe"></i>
-      </button>
+            <i class="fas fa-camera"></i>
+        </button>
+        <button class="button" id="show-card-button">
+            <i class="fas fa-id-card"></i>
+        </button>
+        <button class="button" id="website-button">
+            <i class="fas fa-globe"></i>
+        </button>
     </div>
     
     <!-- T-Rex ステータス表示 -->
@@ -104,6 +107,51 @@
             餌やり回数: <span id="feed-count">0</span>
         </div>
     </div>
+    
+
+    <!-- カードコンテナ -->
+    <div id="card-container" class="card-container hidden">
+        <div class="trading-card">
+            <div class="card-header">
+                <h2 class="dino-name">ティラノサウルス・レックス</h2>
+            </div>
+            <div class="card-image">
+                <img src="./assets/t-rex-card-image.jpg" alt="ティラノサウルス" class="card-image-real" />
+            </div>
+            <div class="card-body">
+                <div class="dino-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">HP</span>
+                        <span class="stat-value">850</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">攻撃力</span>
+                        <span class="stat-value">95</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">防御力</span>
+                        <span class="stat-value">70</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">速　度</span>
+                        <span class="stat-value">60</span>
+                    </div>
+                </div>
+                <div class="dino-info">
+                    <p><strong>学名:</strong> <i>Tyrannosaurus rex</i></p>
+                    <p><strong>時代:</strong> 白亜紀後期 (約6,800万年前)</p>
+                    <p><strong>生息地:</strong> 北アメリカ大陸西部</p>
+                    <p><strong>サイズ:</strong> 体長 約12m / 体重 約8t</p>
+                </div>
+                <div class="dino-trivia">
+                    <h3>豆知識</h3>
+                    <p>ティラノサウルスの名前は「暴君とかげ」っていう意味なんだ。歯の長さは最大20cmもあって、とても強い顎で獲物の骨もバリバリと噛み砕いていたよ。目や鼻がとても良くて、遠くからでも獲物を見つけることができる優秀なハンターだったんだ。</p>
+                </div>
+            </div>
+            <button id="close-card-button" class="close-button">×</button>
+        </div>
+    </div>
+    
     <script src="script.js"></script>
 
 </body>

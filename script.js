@@ -14,10 +14,10 @@ AFRAME.registerComponent("ar-controller", {
     this.hungerLevel = document.getElementById("hunger-level");
     this.feedCount = document.getElementById("feed-count");
     
-    // T-Rex の状態
+    // T-Rex の状態（初期値を低めに設定）
     this.trexStatus = {
-      happiness: 100,
-      hunger: 50,
+      happiness: 50,
+      hunger: 30,
       feedCount: 0,
       lastFeedTime: Date.now()
     };
@@ -49,6 +49,12 @@ AFRAME.registerComponent("ar-controller", {
     
     // ステータス更新タイマー
     this.startStatusUpdater();
+    
+    // ステータスの初期化（表示はしない）
+    this.updateStatusDisplay();
+    
+    // ステータスパネルは初期状態で非表示
+    this.statusPanel.classList.remove('visible');
   },
   
 
@@ -164,8 +170,8 @@ AFRAME.registerComponent("ar-controller", {
     
     this.isFeeding = true;
     this.trexStatus.feedCount++;
-    this.trexStatus.hunger = Math.min(100, this.trexStatus.hunger + 30);
-    this.trexStatus.happiness = Math.min(100, this.trexStatus.happiness + 20);
+    this.trexStatus.hunger = Math.min(100, this.trexStatus.hunger + 15);
+    this.trexStatus.happiness = Math.min(100, this.trexStatus.happiness + 5);
     this.trexStatus.lastFeedTime = Date.now();
     
     // 餌やりアニメーション（特別なアニメーション）
@@ -184,8 +190,6 @@ AFRAME.registerComponent("ar-controller", {
     // 餌やり効果音の再生
     this.playEffectSound('eating');
     
-    // ステータスパネルの表示
-    this.statusPanel.classList.add('visible');
     
     // ステータス表示の更新
     this.updateStatusDisplay();
@@ -196,10 +200,6 @@ AFRAME.registerComponent("ar-controller", {
       this.playNextAnimation();
     }, 3000);
     
-    // 10秒後にステータスパネルを隠す
-    setTimeout(() => {
-      this.statusPanel.classList.remove('visible');
-    }, 10000);
   },
   
   // 餌やりエフェクトの表示
@@ -252,44 +252,51 @@ AFRAME.registerComponent("ar-controller", {
     // デバッグ情報を表示
     console.log(`📊 Status Update: Happiness=${this.trexStatus.happiness}, Hunger=${this.trexStatus.hunger}, FeedCount=${this.trexStatus.feedCount}`);
     
-    // 幸福度の表示
+    // 幸福度の表示（絵文字 + 数値）
+    let happinessEmoji = '';
     if (this.trexStatus.happiness > 80) {
-      this.happinessLevel.textContent = '😄';
+      happinessEmoji = '😄';
       console.log('😄 Very Happy');
     } else if (this.trexStatus.happiness > 60) {
-      this.happinessLevel.textContent = '😊';
+      happinessEmoji = '😊';
       console.log('😊 Happy');
     } else if (this.trexStatus.happiness > 40) {
-      this.happinessLevel.textContent = '😐';
+      happinessEmoji = '😐';
       console.log('😐 Neutral');
     } else if (this.trexStatus.happiness > 20) {
-      this.happinessLevel.textContent = '😢';
+      happinessEmoji = '😢';
       console.log('😢 Sad');
     } else {
-      this.happinessLevel.textContent = '😭';
+      happinessEmoji = '😭';
       console.log('😭 Very Sad');
     }
     
-    // 空腹度の表示
-    if (this.trexStatus.hunger > 80) {
-      this.hungerLevel.textContent = '🍖🍖🍖';
-      console.log('🍖🍖🍖 Very Full');
-    } else if (this.trexStatus.hunger > 60) {
-      this.hungerLevel.textContent = '🍖🍖';
-      console.log('🍖🍖 Full');
-    } else if (this.trexStatus.hunger > 40) {
-      this.hungerLevel.textContent = '🍖';
-      console.log('🍖 Satisfied');
-    } else if (this.trexStatus.hunger > 20) {
-      this.hungerLevel.textContent = '🥩';
-      console.log('🥩 Hungry');
-    } else {
-      this.hungerLevel.textContent = '💀';
+    this.happinessLevel.textContent = `${happinessEmoji} ${this.trexStatus.happiness}%`;
+    
+    // 空腹度の表示（7個の肉メーター）
+    const meatCount = Math.ceil(this.trexStatus.hunger / (100 / 7));
+    let hungerDisplay = '';
+    
+    if (this.trexStatus.hunger <= 0) {
+      hungerDisplay = '💀';
       console.log('💀 Starving');
+    } else {
+      for (let i = 0; i < meatCount; i++) {
+        hungerDisplay += '🍖';
+      }
+      console.log(`🍖x${meatCount} Hunger Level: ${this.trexStatus.hunger}`);
     }
+    
+    this.hungerLevel.textContent = hungerDisplay;
     
     // 餌やり回数
     this.feedCount.textContent = this.trexStatus.feedCount;
+    
+    // ステータスパネルにポップアップ効果を追加
+    this.statusPanel.style.transform = 'scale(1.05)';
+    setTimeout(() => {
+      this.statusPanel.style.transform = 'scale(1)';
+    }, 200);
   },
   
   // ステータス自動更新システム
@@ -299,16 +306,16 @@ AFRAME.registerComponent("ar-controller", {
       const timeSinceLastFeed = now - this.trexStatus.lastFeedTime;
       
       // 時間経過による空腹度と幸福度の減少
-      if (timeSinceLastFeed > 30000) { // 30秒毎
+      if (timeSinceLastFeed > 60000) { // 60秒毎
         this.trexStatus.hunger = Math.max(0, this.trexStatus.hunger - 1);
-        this.trexStatus.happiness = Math.max(0, this.trexStatus.happiness - 0.5);
+        this.trexStatus.happiness = Math.max(0, this.trexStatus.happiness - 1);
         this.trexStatus.lastFeedTime = now;
         
         if (this.statusPanel.classList.contains('visible')) {
           this.updateStatusDisplay();
         }
       }
-    }, 5000); // 5秒毎にチェック
+    }, 10000); // 10秒毎にチェック
   },
 
   setupEventListeners: function () {
@@ -317,6 +324,17 @@ AFRAME.registerComponent("ar-controller", {
       if (this.scanningOverlay) {
         this.scanningOverlay.style.display = "none";
       }
+      // ステータスパネルを表示
+      this.statusPanel.classList.add('visible');
+    });
+
+    this.el.addEventListener("targetLost", () => {
+      console.log("マーカーを見失いました");
+      if (this.scanningOverlay) {
+        this.scanningOverlay.style.display = "block";
+      }
+      // ステータスパネルを隠す
+      this.statusPanel.classList.remove('visible');
     });
     
     // T-Rexモデルへの直接クリックイベント
@@ -397,7 +415,10 @@ AFRAME.registerComponent("ar-controller", {
   
   // T-Rexを撫でる（タップ）
   petTrex: function() {
+    if (this.isSpecialAnimation) return; // 特別なアニメーション中は重複実行を防ぐ
+    
     console.log("T-Rex をタップしました");
+    this.isSpecialAnimation = true;
     this.trexStatus.happiness = Math.min(100, this.trexStatus.happiness + 5);
     
     // 短い喜びアニメーション
@@ -413,31 +434,32 @@ AFRAME.registerComponent("ar-controller", {
     // ハート効果音の再生
     this.playEffectSound('heart');
     
-    // 一時的にステータス表示
-    this.statusPanel.classList.add('visible');
+    // ステータス表示の更新
     this.updateStatusDisplay();
     
+    // 1.5秒後にフラグをリセット（なでる動作は短時間で完了）
     setTimeout(() => {
-      this.statusPanel.classList.remove('visible');
-    }, 3000);
+      this.isSpecialAnimation = false;
+    }, 1500);
+    
   },
   
   
   // ハートエフェクト
   showHeartEffect: function() {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       setTimeout(() => {
         const heart = document.createElement('div');
         heart.className = 'feeding-effect';
         heart.textContent = '💖';
-        heart.style.left = (45 + Math.random() * 10) + '%';
-        heart.style.top = (40 + Math.random() * 10) + '%';
+        heart.style.left = (40 + Math.random() * 20) + '%';
+        heart.style.top = (35 + Math.random() * 20) + '%';
         document.body.appendChild(heart);
         
         setTimeout(() => {
           document.body.removeChild(heart);
         }, 1500);
-      }, i * 300);
+      }, i * 150);
     }
   },
   
@@ -582,4 +604,74 @@ AFRAME.registerComponent("ar-controller", {
       });
     }
   },
+  
+  // アニメーション終了イベントハンドラー
+  onAnimationFinished: function(e) {
+    if (this.isSpecialAnimation) {
+      console.log('特別なアニメーション終了、通常アニメーションに復帰');
+      this.isSpecialAnimation = false;
+      this.playNextAnimation();
+    }
+  },
+  
+});
+
+// トレーディングカード機能
+document.addEventListener('DOMContentLoaded', function() {
+  const showCardButton = document.getElementById('show-card-button');
+  const cardContainer = document.getElementById('card-container');
+  const closeCardButton = document.getElementById('close-card-button');
+
+  // 豆知識のランダムコンテンツ（ファクトチェック済み・科学的事実に基づく）
+  const triviaContent = [
+    "ティラノサウルスの名前は「暴君トカゲの王様」っていう意味なんだ。歯の長さは根っこまで入れると15～30cmもあって、バナナくらいの大きさになるよ。すごく強い顎で獲物の骨もバリバリと噛み砕いていたんだ。",
+    "ティラノサウルスの腕は小さく見えるけど、実はとても筋肉質だったんだ。どのくらいの力があったかはまだ研究中だけど、体を起こすときの支えとして使っていたと考えられているよ。意外と大切な役割があったんだね。",
+    "ティラノサウルスの鼻はとても良くて、においを感じる脳の部分がグレープフルーツくらいの大きさもあったんだ。警察犬よりもずっと匂いを嗅ぎ分けることができて、遠くの獲物の匂いも分かったんだよ。",
+    "ティラノサウルスの仲間の中には羽毛が生えていたものもいるんだ。ユティラヌスやディロングという恐竜に羽毛の跡が見つかっているよ。鳥の祖先でもあるから、今の鳥たちはティラノサウルスの遠い親戚なんだ。",
+    "ティラノサウルスは約6800万年前から6600万年前の約200万年間、地球に住んでいたんだ。最新の研究では、その間に全部で25億頭もいたと計算されているよ。とてもたくさんいたんだね！"
+  ];
+
+  // カードを表示する関数
+  function showCard() {
+    if (cardContainer) {
+      // ランダムに豆知識を選択
+      const randomTrivia = triviaContent[Math.floor(Math.random() * triviaContent.length)];
+      const triviaElement = document.querySelector('.dino-trivia p');
+      if (triviaElement) {
+        triviaElement.textContent = randomTrivia;
+      }
+      
+      cardContainer.classList.remove('hidden');
+      cardContainer.style.display = 'flex'; // 強制的に表示
+    }
+  }
+
+  // カードを非表示にする関数
+  function hideCard() {
+    if (cardContainer) {
+      cardContainer.classList.add('hidden');
+    }
+  }
+
+  // イベントリスナーの設定
+  if (showCardButton) {
+    showCardButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      showCard();
+    });
+  }
+  
+  if (closeCardButton) {
+    closeCardButton.addEventListener('click', hideCard);
+  }
+
+  // カードの外側（背景）をクリックした時に閉じる
+  if (cardContainer) {
+    cardContainer.addEventListener('click', (event) => {
+      if (event.target === cardContainer) {
+        hideCard();
+      }
+    });
+  }
 });
